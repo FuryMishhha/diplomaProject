@@ -1,8 +1,8 @@
 package com.example.backend.Controller;
 
 import com.example.backend.Entity.Order;
-import com.example.backend.Entity.Product;
 import com.example.backend.Entity.User;
+import com.example.backend.Model.ProductSaloon;
 import com.example.backend.Service.OrderService;
 import com.example.backend.Service.ProductService;
 import com.example.backend.Service.UserService;
@@ -38,20 +38,25 @@ public class AdminController {
         userService.updateUser(id, user);
     }
 
-//    @DeleteMapping("/users/{id}")
-//    public User deleteUser(@PathVariable Long id) {
-//        return userService.deleteUser(id);
-//    }
+    @DeleteMapping("/users/{id}")
+    public String deleteUser(@PathVariable Long id) {
+        return userService.deleteUser(id);
+    }
 
     @GetMapping("/products")
-    public void allProducts() {
-        productService.findAll();
+    public List<ProductSaloon> allProducts() {
+        return productService.findAllList();
     }
 
     @GetMapping("/products/{id}")
-    public Product showConcreteProduct(@PathVariable Long id) {
+    public ProductSaloon showConcreteProduct(@PathVariable Long id) {
         return productService.findConcreteProduct(id);
     }
+
+//    @DeleteMapping("/products/{id}")
+//    public String deleteProduct(@RequestBody DataToBase dataToBase) {
+//        return productService.deleteProduct(dataToBase.getOrder_id());
+//    }
 
     @GetMapping("/orders")
     public List<Order> allOrders() {
@@ -64,7 +69,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/orders/{id}")
-    public Order deleteOrder(@PathVariable Integer id) {
+    public String deleteOrder(@PathVariable Integer id) {
         return orderService.deleteOrder(id);
     }
 

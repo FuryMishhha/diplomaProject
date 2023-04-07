@@ -2,19 +2,18 @@ package com.example.backend.Service;
 
 import com.example.backend.Config.ClientConfig;
 import com.example.backend.Entity.Order;
-import com.example.backend.Entity.Product;
 import com.example.backend.Entity.User;
 import com.example.backend.Model.DataToBase;
 import com.example.backend.Model.ProductSaloon;
-import com.example.backend.Repository.ProductRepository;
+import com.example.backend.Repository.OrderRepository;
 import com.example.backend.Repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import javax.transaction.Transactional;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -27,9 +26,9 @@ public class ProductService {
     @Autowired
     OrderService orderService;
     @Autowired
-    private ProductRepository productRepository;
-    @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private OrderRepository orderRepository;
 
     public List<ProductSaloon> findAllList() {
         WebClient webClient = ClientConfig.webClientWithTimeout(1);
@@ -62,81 +61,23 @@ public class ProductService {
 //                .getBody();
 //
 //        result.addAll(third);
-        return result;
-    }
 
-    public void findAll() {
-        WebClient webClient = ClientConfig.webClientWithTimeout(1);
-        List<ProductSaloon> result = webClient
-                .get()
-                .uri("/api1/products")
-                .retrieve()
-                .toEntityList(ProductSaloon.class)
-                .block()
-                .getBody();
-
-//        WebClient webClient2 = ClientConfig.webClientWithTimeout(2);
-//        List<Product> second = webClient2
-//                .get()
-//                .uri("/api2/products")
-//                .retrieve()
-//                .toEntityList(Product.class)
-//                .block()
-//                .getBody();
-//
-//        result.addAll(second);
-//
-//        WebClient webClient3 = ClientConfig.webClientWithTimeout(3);
-//        List<Product> third = webClient3
-//                .get()
-//                .uri("/api3/products")
-//                .retrieve()
-//                .toEntityList(Product.class)
-//                .block()
-//                .getBody();
-//
-//        result.addAll(third);
-
-        if (result != null) {
-            result.forEach(it -> {
-                Product new_product = new Product(
-                        it.getId(),
-                        it.getSaloon_id(),
-                        it.getMileage(),
-                        it.getNumber_of_owners(),
-                        it.getCategory(),
-                        it.getBrand(),
-                        it.getModel(),
-                        it.getRelease_year(),
-                        it.getBody(),
-                        it.getColor(),
-                        it.getEngine(),
-                        it.getDrive(),
-                        it.getWheel(),
-                        it.getPrice(),
-                        it.getPicture()
-                );
-                productRepository.save(new_product);
-            });
+        for (int i = 0; i < result.size(); i++) {
+            result.get(i).setId((long) i);
         }
 
-//        List <Product> product = productRepository.findAll();
-//        product.sort(Comparator.comparingLong(Product::getId));
-//        return product;
+        return result;
     }
 
     public String bookProduct(Long id) {
         User user = userRepository.findByUsername(String.valueOf(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
-
-        findAll();
-
-        Product bookProduct = productRepository.findById(id).orElse(null);
+        List<ProductSaloon> products = findAllList();
+        ProductSaloon bookProduct = products.get(id.intValue());
 
         if (bookProduct != null && bookProduct.getOrder_id() == null) {
             Order order = new Order();
-            Product product = productRepository.findById(id).orElse(null);
-            String carInfoBrand = product.getBrand();
-            String carInfoModel = product.getModel();
+            String carInfoBrand = bookProduct.getBrand();
+            String carInfoModel = bookProduct.getModel();
 
             Integer saloon_id = bookProduct.getSaloon_id();
             Long original_id = bookProduct.getOriginal_id();
@@ -168,28 +109,22 @@ public class ProductService {
                     .bodyToMono(DataToBase.class)
                     .block();
 
-            productRepository.deleteAll();
-
             return "redirect:/api/user/account";
         } else {
             return "redirect:/api/products";
         }
     }
 
-    public Product findConcreteProduct(Long id) {
-        return productRepository.findById(id).orElse(null);
-    }
-
-//    public Product deleteProduct(Long id) {
-//        Product product = productRepository.findById(id).orElse(null);
-//        if (product != null) {
-//            if (product.getOrder_id() != null) {
-//                orderService.deleteOrder(product.getOrder_id());
-//            }
-//            productRepository.deleteById(id);
-//            return product;
-//        } else return null;
+//    public String deleteProduct(Integer id) {
+//        Order order = orderRepository.findById(id).orElse(null);
+//        if (order != null)
+//            orderRepository.deleteById(id);
+//        return "redirect:/api/admin/orders";
 //    }
+
+    public ProductSaloon findConcreteProduct(Long id) {
+        return findAllList().get(id.intValue());
+    }
 
     public String parse(String url) {
         if (url.charAt(("https://drive.google.com/").length()) == 'u') return url;

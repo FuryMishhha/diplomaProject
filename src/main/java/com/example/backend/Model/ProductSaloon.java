@@ -30,6 +30,7 @@ public class ProductSaloon implements Serializable {
     private String picture;
     private Integer order_id;
     private Integer saloon_id;
+    private Long original_id;
 
     public ProductSaloon(Integer mileage, Integer number_of_owners, String category, String brand, String model, Integer release_year, String body, String color, String engine, String drive, String wheel, Integer price, String picture, Integer saloon_id) {
         this.mileage = mileage;

@@ -2,10 +2,10 @@ package com.example.backend.Service;
 
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.*;
 import javax.mail.internet.*;
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
