@@ -79,8 +79,18 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.octo.captcha</groupId>
+            <artifactId>jcaptcha-all</artifactId>
+            <version>1.0-RC6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>quartz</groupId>
+                    <artifactId>quartz</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

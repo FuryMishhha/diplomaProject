@@ -24,17 +24,15 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
+    @Transient
+    private String captcha;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "roles_id", referencedColumnName = "id")}
     )
     private List<Role> roles;
-
-    public User(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
